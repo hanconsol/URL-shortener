@@ -3,7 +3,7 @@ const randomString = require('randomized-string');
 
 const UrlSchema = mongoose.Schema(
     {
-    
+
         url: {
             type: String
         },
@@ -21,4 +21,4 @@ const UrlSchema = mongoose.Schema(
 
 const Url = mongoose.model('Url', UrlSchema);
 
-module.exports =  Url;
+module.exports = Url;
