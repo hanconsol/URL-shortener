@@ -1,16 +1,16 @@
 const mongoose = require('mongoose');
+const randomString = require('randomized-string');
+
 const UrlSchema = mongoose.Schema(
     {
-        urlId: {
-            type: String
-        },
-
+    
         url: {
             type: String
         },
 
-        shortUrl: {
-            type: String
+        short_url: {
+            type: String,
+            default: () => randomString.generate(7)
         }
     },
     {

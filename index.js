@@ -4,7 +4,8 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const Url = require('./models/url.model.js');
-const dns = require('dns');
+const validate = require('./utils/validate.js');
+
 const { error } = require('console');
 const app = express();
 
@@ -30,32 +31,29 @@ app.get('/api/hello', function (req, res) {
 
 // add post
 app.post('/api/shorturl', async (req, res) => {
+
+  const original_url = req.body.url.toString()
+  const hostname = original_url.replace(/(https?:\/\/)(www.)?/gi, "");
+  const valid = await validate(hostname, original_url);
+  console.log(valid);
+  if (valid) { 
   try {
 
-    const original_url = req.body.url.toString()
-    const hostname = original_url.replace("https://www.", "");
+        const url = await Url.create(req.body);
+      const short_url = url.short_url;
 
-    dns.lookup(hostname, (err, address, family) => {
-      console.log(original_url, hostname);
-      if (err) {
-        console.error(err)
-        res.json({ error: "invalid url" })
-      } else {
-        const url = Url.create(req.body);
+      console.log("url = ", url, "req.body =", req.body);
+      res.json({ original_url: url.url, short_url: short_url });
 
-        res.json({ original_url: original_url });
-        console.log("ip_address = ", address);
-
-      }
-
-    });
-   
-  }
+    }
+  
   catch (error) {
     res.json({ error: "Content not posted" })
   }
-})
-
+}else {
+          res.json({ error: "invalid url" });
+  }
+});
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("Database is connected!");
